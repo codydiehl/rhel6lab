@@ -36,7 +36,7 @@ rpm -Uvh /root/bak/centos-conv/epel-release-6-8.noarch.rpm
 
 # install script
 echo "installing the must-have pre-requisites"
-while read -r p ; do yum install -y $p ; done < <(cat << "EOF"
+while read -r p ; do yum install -y "$p" ; done < <(cat << "EOF"
     perl
     zip unzip
     curl
@@ -48,25 +48,26 @@ while read -r p ; do yum install -y $p ; done < <(cat << "EOF"
 EOF
 )
 
-rpm -Uvh --force /root/bak/centos-conv/bash-completion-extras-2.1-11.el7.noarch.rpm
-
 echo installing the nice-to-have pre-requisites
 echo you have 5 seconds to proceed ...
 echo or
 echo hit Ctrl+C to quit
-echo -e "\n"
+echo -e "\\n"
 sleep 6
 
+rpm -Uvh /root/bak/centos-conv/bash-completion-extras-2.1-11.el7.noarch.rpm
 
 # check that the important applications installed. 
 progs=( git python34 )
-for p in $progs; do 
+for p in "${progs[@]}"; do 
     hash "$p" &>/dev/null && echo "$p is installed" ||
                  echo "$p is not installed"
 done 
 
+
 # check that bash-completions installed successfully
-if [[ $(rpm -qa | grep bash-completion) ]]; then
+if rpm -qa | grep -q 'bash-completion'
+then
     echo "bash completions are installed"
 else
     echo "bash-completions was not installed"
@@ -74,7 +75,8 @@ fi
 
 
 # git clone the sources not in Yum
-if [ -x "$(command -v git)" ]; then
+if [ -x "$(command -v git)" ]; 
+then
   mkdir ~/src
   cd ~/src
   git clone https://github.com/vim/vim.git
