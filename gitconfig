@@ -103,3 +103,6 @@
   fetch = +refs/heads/*:refs/remotes/origin/*
 [stash]
   showPatch = true
+[user]
+	name = codydiehl
+	email = diehl17c@gmail.com

@@ -1,0 +1,22 @@
+yum clean all
+cd ~/bak/centos-conv
+dl latest packages from http://mirror.centos.org/centos/6/os/x86_64/Packages/
+
+wget http://mirror.centos.org/centos/6/os/x86_64/RPM-GPG-KEY-CentOS-6
+wget http://mirror.centos.org/centos/6/os/x86_64/Packages/centos-release-6-x.el6.centos.xx.x.x86_64.rpm
+wget http://mirror.centos.org/centos/6/os/x86_64/Packages/centos-indexhtml-6-x.el6.centos.noarch.rpm
+wget http://mirror.centos.org/centos/6/os/x86_64/Packages/yum-x.x.xx-xx.el6.centos.noarch.rpm
+wget http://mirror.centos.org/centos/6/os/x86_64/Packages/yum-plugin-fastestmirror-x.x.xx-xx.el6.noarch.rpm
+
+rpm --import RPM-GPG-KEY-CentOS-6
+
+yum remove rhnlib abrt-plugin-bugzilla redhat-release-notes*
+rpm -e --nodeps redhat-release-server-6server redhat-indexhtml
+
+subscription-manager clean
+yum remove subscription-manager
+
+rpm -Uvh --force *.rpm
+
+yum clean all
+yum upgrade
