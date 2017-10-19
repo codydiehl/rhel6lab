@@ -1,0 +1,8 @@
+ln -sf "$HOME"/bak/bashrc "$HOME"/.bashrc
+ln -sf "$HOME"/bak/inputrc "$HOME"/.inputrc
+ln -sf "$HOME"/bak/vimrc "$HOME"/.vimrc
+ln -sf "$HOME"/bak/gitconfig "$HOME"/.gitconfig
+ln -sf "$HOME"/bak/lscolors "$HOME"/.lscolors
+ln -sf "$HOME"/bak/vim "$HOME"/.vim
+
+echo "install vim8, git, python34, grc"
