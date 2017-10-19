@@ -1,3 +1,13 @@
+#!/bin/bash
+
+# fail on error , debug all lines
+set -eu -o pipefail 
+
+sudo -n true
+test $? -eq 0 || exit 1 "you should have sudo priveledge to run this script"
+
+
+# build home dotfiles
 ln -sf "$HOME"/bak/bashrc "$HOME"/.bashrc
 ln -sf "$HOME"/bak/inputrc "$HOME"/.inputrc
 ln -sf "$HOME"/bak/vimrc "$HOME"/.vimrc
@@ -5,4 +15,70 @@ ln -sf "$HOME"/bak/gitconfig "$HOME"/.gitconfig
 ln -sf "$HOME"/bak/lscolors "$HOME"/.lscolors
 ln -sf "$HOME"/bak/vim "$HOME"/.vim
 
-echo "install vim8, git, python34, grc"
+
+# convert to CentOS
+yum clean all
+echo "http://mirror.centos.org/centos/6/os/x86_64/Packages/"
+cd ~/bak/centos-conv
+rpm --import /root/bak/centos-conv/RPM-GPG-KEY-CentOS-6
+yum remove rhnlib abrt-plugin-bugzilla redhat-release-notes*
+if [ -x "$(command -v subscription-manager)" ]; then
+  subscription-manager clean
+  yum remove subscription-manager
+fi
+rpm -Uvh --force /root/bak/centos-conv/python-urlgrabber-3.9.1-11.el6.noarch.rpm
+rpm -Uvh --force /root/bak/centos-conv/yum-*.rpm
+rpm -Uvh --force /root/bak/centos-conv/centos-*
+yum clean all
+yum upgrade
+rpm -Uvh /root/bak/centos-conv/epel-release-6-8.noarch.rpm
+
+
+# install script
+echo "installing the must-have pre-requisites"
+while read -r p ; do yum install -y $p ; done < <(cat << "EOF"
+    perl
+    zip unzip
+    curl
+    wget
+    git
+    python34
+    bash-completion
+    
+EOF
+)
+
+rpm -Uvh --force /root/bak/centos-conv/bash-completion-extras-2.1-11.el7.noarch.rpm
+
+echo installing the nice-to-have pre-requisites
+echo you have 5 seconds to proceed ...
+echo or
+echo hit Ctrl+C to quit
+echo -e "\n"
+sleep 6
+
+
+# check that the important applications installed. 
+progs=( git python34 )
+for p in $progs; do 
+    hash "$p" &>/dev/null && echo "$p is installed" ||
+                 echo "$p is not installed"
+done 
+
+# check that bash-completions installed successfully
+if [[ $(rpm -qa | grep bash-completion) ]]; then
+    echo "bash completions are installed"
+else
+    echo "bash-completions was not installed"
+fi
+
+
+# git clone the sources not in Yum
+if [ -x "$(command -v git)" ]; then
+  mkdir ~/src
+  cd ~/src
+  git clone https://github.com/vim/vim.git
+  git clone https://github.com/garabik/grc.git
+else
+  echo "git is not installed"
+fi
